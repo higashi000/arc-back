@@ -2,13 +2,12 @@ package slack
 
 import (
 	"log"
-	"os"
 
 	"github.com/slack-go/slack"
 )
 
 func UserList(names []string) []slack.User {
-	api := slack.New(os.Getenv("SLACK_TOKEN"))
+	api := Api()
 
 	users, err := api.GetUsers()
 	if err != nil {
