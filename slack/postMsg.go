@@ -4,7 +4,7 @@ import (
 	"github.com/slack-go/slack"
 )
 
-func PostMsg(target []slack.User, channelID string, sendText string) error {
+func PostMsg(target []slack.User, channelID string, sendText string) (string, string, error) {
 	api := Api()
 	text := ""
 
@@ -14,14 +14,14 @@ func PostMsg(target []slack.User, channelID string, sendText string) error {
 
 	text += sendText
 
-	_, _, err := api.PostMessage(channelID,
+	channelID, ts, err := api.PostMessage(channelID,
 		slack.MsgOptionAsUser(true),
 		slack.MsgOptionText(text, false),
 		slack.MsgOptionAttachments(slack.Attachment{}))
 
 	if err != nil {
-		return err
+		return channelID, ts, err
 	}
 
-	return nil
+	return channelID, ts, nil
 }
