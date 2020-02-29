@@ -22,7 +22,6 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-
 	defer client.Close()
 
 	r := gin.Default()
