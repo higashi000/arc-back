@@ -4,10 +4,11 @@ import (
 	"context"
 	"log"
 
+	"cloud.google.com/go/firestore"
 	firebase "firebase.google.com/go"
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
-	"github.com/higashi000/arc-back/addmsg"
+  "github.com/higashi000/arc-back/addmsg"
 )
 
 func main() {
@@ -30,6 +31,17 @@ func main() {
 	r.Use(cors.New(config))
 
 	addmsg.AddMsg(r, client, ctx)
+  Test(r, client, ctx)
 
-	r.Run()
+  r.Run()
+}
+
+func Test(r *gin.Engine, client *firestore.Client, ctx context.Context) {
+  r.POST("arc/test/", func(c *gin.Context) {
+    _, _ = client.Collection("messages").Doc("hoge").Set(ctx, map[string]interface{}{
+      "hoge": "hoge",
+      "fuga": "fuga",
+    })
+    c.String(200, "hogehoge")
+  })
 }
