@@ -4,7 +4,7 @@ import (
 	"github.com/slack-go/slack"
 )
 
-func CheckReaction(ts string, channelID string) ([]string, error) {
+func CheckReaction(ts, channelID string, slackrn []string) ([]string, error) {
 	api := Api()
 
 	var reactedUser []string
@@ -27,5 +27,30 @@ func CheckReaction(ts string, channelID string) ([]string, error) {
 		reactedUser = append(reactedUser, e.Users...)
 	}
 
-	return reactedUser, nil
+  m := make(mpa[string]bool)
+  var msgSendTarget []string
+  var delDuplication []string
+  var sendMsgUser []string
+
+  for _, e := range reactedUser {
+    if !m[e] {
+      m[e] = true
+      delDuplication = append(delDuplication, e)
+    }
+  }
+
+  for _, reacted := range delDuplication {
+    flg := false
+    for _, target := range slackrn {
+      if reacted == target {
+        flg = true
+      }
+    }
+
+    if !flg {
+      sendMsgUser = append(sendMsgUser, target)
+    }
+  }
+
+	return sendMsgUser, nil
 }
