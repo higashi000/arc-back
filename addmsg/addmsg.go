@@ -2,7 +2,6 @@ package addmsg
 
 import (
 	"context"
-	"fmt"
 	"log"
 	"net/http"
 
@@ -18,8 +17,8 @@ type Msg struct {
 }
 
 type User struct {
-	SlackRN   string `json:"slackrn"`
-	TwitterID string `json:"twitterid"`
+	SlackRN   string `json:"SlackRN"`
+	TwitterID string `json:"TwitterID"`
 }
 
 func AddMsg(r *gin.Engine, client *firestore.Client, ctx context.Context) {
@@ -40,7 +39,7 @@ func AddMsg(r *gin.Engine, client *firestore.Client, ctx context.Context) {
 		}
 
 		_, _, err = client.Collection("messages").Add(ctx, map[string]interface{}{
-			"channelID": channelID,
+			"channel":   channelID,
 			"timestamp": ts,
 			"mention":   msg.Users,
 		})
