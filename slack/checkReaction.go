@@ -1,6 +1,8 @@
 package slack
 
 import (
+	"fmt"
+
 	"github.com/slack-go/slack"
 )
 
@@ -9,8 +11,9 @@ func CheckReaction(ts, channelID string, slackrn []string) ([]string, error) {
 
 	var reactedUser []string
 
-	history, err := api.GetChannelHistory(channelID, slack.HistoryParameters{"0", "0", 100, false, false})
+	history, err := api.GetChannelHistory(channelID, slack.HistoryParameters{"0", "0", 50, false, false})
 	if err != nil {
+		fmt.Println(channelID)
 		return reactedUser, err
 	}
 
@@ -27,30 +30,31 @@ func CheckReaction(ts, channelID string, slackrn []string) ([]string, error) {
 		reactedUser = append(reactedUser, e.Users...)
 	}
 
-  m := make(mpa[string]bool)
-  var msgSendTarget []string
-  var delDuplication []string
-  var sendMsgUser []string
+	m := make(map[string]bool)
+	var delDuplication []string
+	var sendMsgUser []string
 
-  for _, e := range reactedUser {
-    if !m[e] {
-      m[e] = true
-      delDuplication = append(delDuplication, e)
-    }
-  }
+	for _, e := range reactedUser {
+		if !m[e] {
+			m[e] = true
+			delDuplication = append(delDuplication, e)
+		}
+	}
 
-  for _, reacted := range delDuplication {
-    flg := false
-    for _, target := range slackrn {
-      if reacted == target {
-        flg = true
-      }
-    }
+	for _, reacted := range delDuplication {
+		flg := false
+		var targetuser string
+		for _, target := range slackrn {
+			targetuser = target
+			if reacted == target {
+				flg = true
+			}
+		}
 
-    if !flg {
-      sendMsgUser = append(sendMsgUser, target)
-    }
-  }
+		if !flg {
+			sendMsgUser = append(sendMsgUser, targetuser)
+		}
+	}
 
 	return sendMsgUser, nil
 }
