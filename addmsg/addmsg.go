@@ -18,6 +18,7 @@ type Msg struct {
 
 type User struct {
 	SlackRN   string `json:"SlackRN"`
+	SlackID   string `json:"SlackID"`
 	TwitterID string `json:"TwitterID"`
 }
 
