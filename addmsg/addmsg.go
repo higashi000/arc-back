@@ -34,6 +34,14 @@ func AddMsg(r *gin.Engine, client *firestore.Client, ctx context.Context) {
 		}
 		users := arcslack.UserList(slackRN)
 
+		for i, e := range msg.Users {
+			for _, user := range users {
+				if e.SlackRN == user.Profile.RealName {
+					msg.Users[i].SlackID = user.ID
+				}
+			}
+		}
+
 		channelID, ts, err := arcslack.PostMsg(users, msg.Channel, msg.Text)
 		if err != nil {
 			log.Fatal(err)
