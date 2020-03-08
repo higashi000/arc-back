@@ -5,13 +5,14 @@ import (
 
 	"cloud.google.com/go/firestore"
 	arcslack "github.com/higashi000/arc-back/slack"
-	arctwitter "github.com/higashi000/arc-back/tweet"
+	arctweet "github.com/higashi000/arc-back/tweet"
 	"google.golang.org/api/iterator"
 )
 
 type Msg struct {
 	Mention []struct {
 		SlackRN   string `json:"SlackRN"`
+		SlackID   string `json:"SlackID"`
 		TwitterID string `json:"TwitterID"`
 	} `json:"mention"`
 	Text      string `json:"text"`
@@ -40,33 +41,36 @@ func SendMsg(client *firestore.Client, ctx context.Context) error {
 	}
 
 	for _, e := range msgs {
-		var slackrn []string
-		var twitterid []string
-
+		var tmp []string
 		for _, user := range e.Mention {
-			slackrn = append(slackrn, user.SlackRN)
-			twitterid = append(twitterid, user.SlackRN)
+			tmp = append(tmp, user.SlackID)
 		}
-
-		notReaction, err := arcslack.CheckReaction(e.Timestamp, "CEVCQUGAJ", slackrn)
+		reactedUser, err := arcslack.CheckReaction(e.Timestamp, e.Channel, tmp)
 		if err != nil {
 			return err
 		}
 
-		var notReactionTwitter []string
+		var sendTarget []string
 
-		for _, user := range e.Mention {
-			for _, notreaction := range notReaction {
-				if notreaction == user.SlackRN {
-					notReactionTwitter = append(notReactionTwitter, user.TwitterID)
+		for _, target := range e.Mention {
+			flg := false
+			for i := 0; i < len(reactedUser); i++ {
+				if target.SlackID == reactedUser[i] {
+					flg = true
 					break
 				}
 			}
+
+			if !flg {
+				sendTarget = append(sendTarget, target.TwitterID)
+			}
 		}
 
-		err = arctwitter.Tweet("slackにメッセージが届いています", notReactionTwitter)
-		if err != nil {
-			return err
+		if len(sendTarget) != 0 {
+			err = arctweet.Tweet("slackにメッセージが届いています。\nリアクションをしろ", sendTarget)
+			if err != nil {
+				return err
+			}
 		}
 	}
 
