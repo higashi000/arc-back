@@ -66,8 +66,15 @@ func SendMsg(client *firestore.Client, ctx context.Context) error {
 			}
 		}
 
+		var attachmentText string
+		if len([]rune(e.Text)) > 20 {
+			attachmentText = string([]rune(e.Text)[:20]) + "..."
+		} else {
+			attachmentText = e.Text
+		}
+
 		if len(sendTarget) != 0 {
-			err = arctweet.Tweet("slackにメッセージが届いています。\nリアクションをしろ", sendTarget)
+			err = arctweet.Tweet("Slackに「"+attachmentText+"」というメッセージが届いています。\nリアクションをしてください", sendTarget)
 			if err != nil {
 				return err
 			}
