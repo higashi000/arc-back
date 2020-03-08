@@ -49,6 +49,7 @@ func AddMsg(r *gin.Engine, client *firestore.Client, ctx context.Context) {
 
 		_, _, err = client.Collection("messages").Add(ctx, map[string]interface{}{
 			"channel":   channelID,
+			"text":      msg.Text,
 			"timestamp": ts,
 			"mention":   msg.Users,
 		})
