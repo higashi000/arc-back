@@ -3,12 +3,14 @@ package main
 import (
 	"context"
 	"log"
+	"os"
 
 	"cloud.google.com/go/firestore"
 	firebase "firebase.google.com/go"
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
-  "github.com/higashi000/arc-back/addmsg"
+	"github.com/higashi000/arc-back/addmsg"
+	"github.com/higashi000/arc-back/sendmsg"
 )
 
 func main() {
@@ -27,21 +29,24 @@ func main() {
 
 	r := gin.Default()
 	config := cors.DefaultConfig()
-	config.AllowAllOrigins = true
+	config.AllowOrigins = []string{os.Getenv("ALLOW_ORIGIN")}
 	r.Use(cors.New(config))
 
 	addmsg.AddMsg(r, client, ctx)
-  Test(r, client, ctx)
+	Test(r, client, ctx)
 
-  r.Run()
+	r.Run()
 }
 
 func Test(r *gin.Engine, client *firestore.Client, ctx context.Context) {
-  r.POST("arc/test/", func(c *gin.Context) {
-    _, _ = client.Collection("messages").Doc("hoge").Set(ctx, map[string]interface{}{
-      "hoge": "hoge",
-      "fuga": "fuga",
-    })
-    c.String(200, "hogehoge")
-  })
+	r.GET("arc/test/", func(c *gin.Context) {
+		err := sendmsg.SendMsg(client, ctx)
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		sendmsg.SendMsg(client, ctx)
+
+		c.String(200, "hogehoge")
+	})
 }
