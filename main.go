@@ -9,7 +9,7 @@ import (
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/higashi000/arc-back/addmsg"
-	"github.com/higashi000/arc-back/sendmsg"
+	"github.com/higashi000/arc-back/check"
 )
 
 func main() {
@@ -33,19 +33,13 @@ func main() {
 
 	addmsg.AddMsg(r, client, ctx)
 	Test(r, client, ctx)
+	check.Check(r, client, ctx)
 
 	r.Run()
 }
 
 func Test(r *gin.Engine, client *firestore.Client, ctx context.Context) {
 	r.GET("arc/test/", func(c *gin.Context) {
-		err := sendmsg.SendMsg(client, ctx)
-		if err != nil {
-			log.Fatal(err)
-		}
-
-		sendmsg.SendMsg(client, ctx)
-
 		c.String(200, "hogehoge")
 	})
 }
