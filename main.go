@@ -3,7 +3,6 @@ package main
 import (
 	"context"
 	"log"
-	"os"
 
 	"cloud.google.com/go/firestore"
 	firebase "firebase.google.com/go"
@@ -29,7 +28,7 @@ func main() {
 
 	r := gin.Default()
 	config := cors.DefaultConfig()
-	config.AllowOrigins = []string{os.Getenv("ALLOW_ORIGIN")}
+	config.AllowAllOrigins = true
 	r.Use(cors.New(config))
 
 	addmsg.AddMsg(r, client, ctx)
