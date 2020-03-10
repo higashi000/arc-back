@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"log"
+	"os"
 
 	"cloud.google.com/go/firestore"
 	firebase "firebase.google.com/go"
@@ -14,7 +15,7 @@ import (
 
 func main() {
 	ctx := context.Background()
-	conf := &firebase.Config{ProjectID: "higashi-arc"}
+	conf := &firebase.Config{ProjectID: os.Getenv("PROJECT_ID")}
 	app, err := firebase.NewApp(ctx, conf)
 	if err != nil {
 		log.Fatal(err)
