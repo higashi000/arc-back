@@ -4,6 +4,7 @@ import (
 	"context"
 	"log"
 	"net/http"
+	"os"
 
 	"cloud.google.com/go/firestore"
 	"github.com/gin-gonic/gin"
@@ -12,6 +13,7 @@ import (
 
 type Msg struct {
 	Users   []User `json:"mention"`
+	Pass    string `json:"pass"`
 	Text    string `json:"text"`
 	Channel string `json:"channel"`
 }
@@ -26,6 +28,13 @@ func AddMsg(r *gin.Engine, client *firestore.Client, ctx context.Context) {
 	r.POST("arc/AddMsg", func(c *gin.Context) {
 		var msg Msg
 		c.BindJSON(&msg)
+
+		channelID := arcslack.GetChannelID(msg.Channel)
+
+		if msg.Pass != os.Getenv("PASS") {
+			c.JSON(http.StatusOK, `{"status":"false"}`)
+			return
+		}
 
 		var slackRN []string
 
@@ -42,7 +51,7 @@ func AddMsg(r *gin.Engine, client *firestore.Client, ctx context.Context) {
 			}
 		}
 
-		channelID, ts, err := arcslack.PostMsg(users, msg.Channel, msg.Text)
+		channelID, ts, err := arcslack.PostMsg(users, channelID, msg.Text)
 		if err != nil {
 			log.Fatal(err)
 		}
