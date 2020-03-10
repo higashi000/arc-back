@@ -57,6 +57,6 @@ func AddMsg(r *gin.Engine, client *firestore.Client, ctx context.Context) {
 			log.Fatal(err)
 		}
 
-		c.JSON(http.StatusOK, msg)
+		c.JSON(http.StatusOK, `{"status":"Ok"}`)
 	})
 }
